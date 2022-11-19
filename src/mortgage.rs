@@ -89,7 +89,7 @@ pub mod mortgage {
 
         fn calculate_annuity_body_part(&self, amount: Option<f32>) -> f32 {
             //Расчет основной части кредита в ежемесечном платеже
-            let mounthly_payment = self.calculate_annuity_monthly_payment(amount);
+            let mounthly_payment = self.calculate_annuity_monthly_payment(Some(self.amount as f32));
             let percent_part = self.calculate_percent_part(amount);
             let body_part = mounthly_payment - percent_part;
             body_part
