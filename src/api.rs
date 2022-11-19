@@ -2,7 +2,7 @@ pub mod api {
     use crate::mortgage::mortgage::Mortgage;
     use actix_web::{get, post, web, App, HttpResponse, Result, Responder};
 
-    #[post("/shedule")]
+    #[post("/schedule")]
     pub async fn payment_schedule(mortgage: String) -> Result<impl Responder>  {
         let mortgage: Mortgage = serde_json::from_str(&mortgage[..]).unwrap();
         let response = mortgage.show_payment_schedule();
