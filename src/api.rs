@@ -1,6 +1,6 @@
 pub mod api {
     use crate::mortgage::mortgage::Mortgage;
-    use actix_web::{get, post, web, App, HttpResponse, Result, Responder};
+    use actix_web::{post, web, HttpResponse, Result, Responder};
 
     #[post("/schedule")]
     pub async fn payment_schedule(mortgage: String) -> Result<impl Responder>  {

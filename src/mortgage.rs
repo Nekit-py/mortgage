@@ -1,16 +1,19 @@
 pub mod mortgage {
 
     extern crate chrono;
-    use chrono::format::ParseError;
     use chrono::{Months, NaiveDate};
-    use std::collections::BTreeMap;
     use serde::{Serialize, Deserialize};
 
     //https://mortgage-calculator.ru/формула-расчета-ипотеки/
-    type Payments = BTreeMap<String, f32>;
-    #[derive(Serialize)]
-    pub struct PaymentShedule {
-        payment_details: BTreeMap<String, Payments>
+    type Payments = Vec<Payment>;
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Payment {
+        date: String,
+        mounthly_payment: f32,
+        percent_part: f32,
+        body_part: f32,
+        remaining_debt: f32
     }
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -68,7 +71,6 @@ pub mod mortgage {
             monthly_payment
         }
 
-        //Тут ошибка?
         fn calculate_percent_part(&self, amount: Option<f32>) -> f32 {
             //Расчет суммы процентов которые начисляются за месяц
             //Одинаково для аннуитентных и диффиринциальных платежей
@@ -128,32 +130,23 @@ pub mod mortgage {
             next_payment_date
         }
 
-        pub fn show_payment_schedule(&self) -> PaymentShedule {
+        pub fn show_payment_schedule(&self) -> Vec<Payment> {
             //Распечатывает график платежей
-            let mut p_d: BTreeMap<String, Payments> = BTreeMap::new();
-            let mut payments:Payments = BTreeMap::new();
-            let mut date: String;
-            let mut mounthly_payment: f32;
-            let mut percent_part: f32;
-            let mut body_part: f32;
+            let mut payments: Payments = Vec::new();
             let mut debt_on_date: f32;
             if self.payment_type == "annuity".to_string() {
                 for m in 1..(self.period * 12 + 1) {
-                    date = self.next_payment_date(m).unwrap().to_string();
                     debt_on_date = self.debt_on_date(m);
-                    body_part = self.calculate_annuity_body_part(Some(debt_on_date));
-                    percent_part = self.calculate_percent_part(Some(debt_on_date));
-                    mounthly_payment = self.calculate_annuity_monthly_payment(None);
-                    payments.insert("mounthly_payment".to_string(), mounthly_payment);
-                    payments.insert("percent_part".to_string(), percent_part);
-                    payments.insert("body_part".to_string(), body_part);
-                    payments.insert("remaining_debt".to_string(), debt_on_date);
-                    p_d.insert(date, payments.clone());
+                    payments.push(Payment {
+                         date: self.next_payment_date(m).unwrap().to_string(),
+                         mounthly_payment: self.calculate_annuity_monthly_payment(None),
+                         percent_part: self.calculate_percent_part(Some(debt_on_date)),
+                         body_part: self.calculate_annuity_body_part(Some(debt_on_date)),
+                         remaining_debt: debt_on_date,
+                    })
                 }
             }
-            PaymentShedule {
-                payment_details: p_d,
-            }
+            payments
         }
 
         fn debt_on_date(&self, month: u16) -> f32 {
