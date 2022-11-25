@@ -3,14 +3,14 @@ pub mod mortgage {
     extern crate chrono;
     use chrono::format::ParseError;
     use chrono::{Months, NaiveDate};
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
     use serde::{Serialize, Deserialize};
 
     //https://mortgage-calculator.ru/формула-расчета-ипотеки/
-    type Payments = HashMap<String, f32>;
+    type Payments = BTreeMap<String, f32>;
     #[derive(Serialize)]
     pub struct PaymentShedule {
-        payment_details: HashMap<String, Payments>
+        payment_details: BTreeMap<String, Payments>
     }
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -130,8 +130,8 @@ pub mod mortgage {
 
         pub fn show_payment_schedule(&self) -> PaymentShedule {
             //Распечатывает график платежей
-            let mut p_d: HashMap<String, Payments> = HashMap::new();
-            let mut payments:Payments = HashMap::new();
+            let mut p_d: BTreeMap<String, Payments> = BTreeMap::new();
+            let mut payments:Payments = BTreeMap::new();
             let mut date: String;
             let mut mounthly_payment: f32;
             let mut percent_part: f32;
